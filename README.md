@@ -1,6 +1,6 @@
-# FAIR / OS — CPU Scheduling Fairness Lab
+# CPU Scheduling Fairness — FAIR / OS Lab
 
-FAIR / OS compares five classical CPU schedulers with **Hybrid Nice-Weighted Fairness (HNWF)**, a deterministic Phase 2 policy combining Linux-style nice weights, virtual runtime, weighted fairness debt, temporary boosts, and an emergency service-gap guard.
+FAIR / OS compares five classical CPU schedulers and measures how each changes when supervised by **Hybrid Nice-Weighted Fairness (HNWF)**. HNWF is a fairness layer—not a sixth baseline scheduler—and combines Linux-style nice weights, virtual runtime, weighted fairness debt, ML starvation/unfairness risk estimates, temporary boosts, and an emergency service-gap guard.
 
 ## Algorithms
 
@@ -9,13 +9,14 @@ FAIR / OS compares five classical CPU schedulers with **Hybrid Nice-Weighted Fai
 - SRTF
 - Round Robin
 - Non-preemptive Priority
-- HNWF
+
+Each baseline can also run as `Algorithm + HNWF` for direct comparison.
 
 ## Four interactive views
 
 1. **Overview** — comparison metrics and linked fairness events.
-2. **Simulation** — workload controls, CPU theater, process table, and execution timeline.
-3. **Fairness** — debt history, service-gap heatmap, and actual-versus-ideal service.
+2. **Simulation** — workload controls, circular process lifecycle, animated dispatch, and execution timeline.
+3. **Fairness** — interactive base-versus-HNWF fairness, starvation, and ML-intervention comparisons.
 4. **Process** — one process from arrival through nice mapping, weight, ideal service, debt, guard, and completion.
 
 ## Quick start on Windows

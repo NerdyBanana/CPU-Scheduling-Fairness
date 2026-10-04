@@ -1,0 +1,6 @@
+# Phase 1 CPU Scheduling Baseline & UI Requirements
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+streamlit>=1.30.0
+plotly>=5.18.0

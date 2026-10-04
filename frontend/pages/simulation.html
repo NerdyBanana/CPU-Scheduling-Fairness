@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Simulation | CPU Scheduling Analyzer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/simulation.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="padding: 24px; background-color: var(--bg-app);">
+  <div class="simulation-layout">
+    
+    <div class="view-header">
+      <h1 class="view-title">3D CPU Scheduling Simulation</h1>
+      <p class="view-subtitle">Interactive 3D Hardware Viewport with Real-Time HTML Status Readings & Workload Controls</p>
+    </div>
+
+    <!-- 1. Algorithm Selection & Simulation Master Actions Deck -->
+    <div class="algo-controls-bar">
+      <div class="algo-btn-group">
+        <button class="sim-algo-btn active" data-algo="RR">Round Robin</button>
+        <button class="sim-algo-btn" data-algo="FCFS">FCFS</button>
+        <button class="sim-algo-btn" data-algo="SJF">SJF</button>
+        <button class="sim-algo-btn" data-algo="SRTF">SRTF</button>
+        <button class="sim-algo-btn" data-algo="PRIORITY">Priority</button>
+      </div>
+
+      <!-- Dynamic Round Robin Time Quantum Input -->
+      <div class="quantum-control-box" id="quantum-control-container">
+        <label class="quantum-label" for="input-time-quantum">Time Quantum (q):</label>
+        <div class="quantum-input-wrap">
+          <input type="number" id="input-time-quantum" class="quantum-input" min="1" max="20" value="2">
+          <span class="quantum-unit">ms</span>
+        </div>
+      </div>
+
+      <!-- Simulation Action Buttons -->
+      <div class="sim-actions-group">
+        <button id="btn-run-simulation" class="btn-action-primary" title="Execute simulation for selected algorithm and workload">
+          <span>▶</span> RUN SIMULATION
+        </button>
+        <button id="btn-reset-simulation" class="btn-action-secondary" title="Reset simulation clock and state">
+          <span>↺</span> RESET
+        </button>
+        <button id="btn-run-full-experiment" class="btn-action-disabled" disabled title="Executes 150-scenario benchmark matrix (Backend integration required)">
+          <span>⚗️</span> RUN FULL EXPERIMENT
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Workload Selection & Custom CSV Bar -->
+    <div class="workload-controls-bar">
+      <div class="control-item-wrap">
+        <span class="control-label-text">Workload:</span>
+        <div class="workload-pills-group">
+          <button class="workload-pill active" data-workload="normal">Normal</button>
+          <button class="workload-pill" data-workload="skewed">Skewed</button>
+          <button class="workload-pill" data-workload="bursty">Bursty</button>
+        </div>
+      </div>
+
+      <div class="control-item-wrap">
+        <span class="control-label-text">Process Count:</span>
+        <input type="number" class="compact-input input-proc-count" min="1" max="25" value="6" title="Number of processes to dispatch">
+      </div>
+
+      <div class="control-item-wrap">
+        <span class="control-label-text">Random Seed:</span>
+        <select class="compact-select select-workload-seed" title="Random seed (0-9)">
+          <option value="0" selected>Seed 0</option>
+          <option value="1">Seed 1</option>
+          <option value="2">Seed 2</option>
+          <option value="3">Seed 3</option>
+          <option value="4">Seed 4</option>
+          <option value="5">Seed 5</option>
+          <option value="6">Seed 6</option>
+          <option value="7">Seed 7</option>
+          <option value="8">Seed 8</option>
+          <option value="9">Seed 9</option>
+        </select>
+      </div>
+
+      <div class="control-item-wrap">
+        <button type="button" class="btn-upload-csv btn-upload-csv-trigger" title="Upload custom CSV workload with PID, Arrival_Time, Burst_Time, Priority">
+          <span>📁</span> Upload CSV
+        </button>
+        <input type="file" id="input-custom-csv-file" accept=".csv" style="display:none;">
+        <span id="custom-csv-status-badge" style="display:none;"></span>
+      </div>
+    </div>
+
+    <!-- 3. Main Visualizer Split: 3D Viewport + HTML Status Card -->
+    <div class="visualizer-main-grid">
+      
+      <!-- 3D Spline Viewport Container -->
+      <div class="spline-container-card">
+        <div class="spline-topbar">
+          <div class="spline-window-title">
+            <div class="window-dots">
+              <span class="dot-red"></span>
+              <span class="dot-yellow"></span>
+              <span class="dot-green"></span>
+            </div>
+            <span>CPU Execution Unit (3D Hardware Viewport)</span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <span class="badge badge-primary">Isometric 26°</span>
+          </div>
+        </div>
+
+        <!-- 3D Viewport Box -->
+        <div class="spline-viewport-box" id="spline-viewport-frame">
+          <img 
+            id="spline-viewport-preview-img" 
+            src="../assets/spline_preview.jpg" 
+            alt="Spline 3D CPU Hardware Simulation (Ready Queue, Dispatch Bus, CPU Cores 1–4, Completed Tray)"
+            style="width: 100%; height: 100%; object-fit: cover; display: block;"
+          >
+          <div style="position: absolute; bottom: 16px; left: 16px; background: rgba(7, 12, 24, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 6px; padding: 6px 12px; font-family: var(--font-mono); font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 8px;">
+            <span class="pulse-indicator"></span>
+            <span>READY QUEUE (P1–P6) ➔ DISPATCH PATH ➔ CPU CORES (1–4) ➔ COMPLETED</span>
+          </div>
+        </div>
+
+        <div class="spline-footer-legend">
+          <div class="legend-group">
+            <div class="legend-pill">
+              <span class="legend-swatch swatch-queue"></span>
+              <span>Ready Queue (P1–P6)</span>
+            </div>
+            <div class="legend-pill">
+              <span class="legend-swatch swatch-core"></span>
+              <span>CPU Cores (1–4)</span>
+            </div>
+            <div class="legend-pill">
+              <span class="legend-swatch swatch-complete"></span>
+              <span>Completed Area</span>
+            </div>
+          </div>
+          <div>Decoupled HTML Overlay Architecture</div>
+        </div>
+      </div>
+
+      <!-- HTML Simulation-Status Panel -->
+      <aside class="sim-status-card" id="sim-status-card">
+        <div>
+          <div class="status-card-header">
+            <div class="header-title-block">
+              <span class="header-badge-tag">Active Algorithm</span>
+              <h2 id="stat-algo-name" class="status-algo-heading">ROUND ROBIN</h2>
+            </div>
+            <span id="stat-proc-state" class="state-badge badge-running">RUNNING</span>
+          </div>
+
+          <!-- Metric Readings List -->
+          <div class="status-readings-list">
+            <div class="reading-item">
+              <span class="reading-key">Running Process</span>
+              <span id="stat-proc-id" class="reading-val p-tag">P1</span>
+            </div>
+
+            <div class="reading-item">
+              <span class="reading-key">Current CPU Core</span>
+              <span id="stat-cpu-core" class="reading-val core-tag">Core 1</span>
+            </div>
+
+            <div class="reading-item">
+              <span class="reading-key">Time Quantum</span>
+              <span id="stat-quantum-val" class="reading-val">2 ms</span>
+            </div>
+
+            <div class="reading-item">
+              <span class="reading-key">Remaining Burst Time</span>
+              <span id="stat-remaining-val" class="reading-val">17 ms</span>
+            </div>
+
+            <div class="reading-item">
+              <span class="reading-key">Simulation Time</span>
+              <span id="stat-sim-time" class="reading-val">0.0 ms</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Playback Controls Bar -->
+        <div class="playback-controls-bar">
+          <button id="btn-sim-play" class="playback-btn btn-play active" title="Play Simulation">
+            <span>▶</span> Play
+          </button>
+          <button id="btn-sim-pause" class="playback-btn btn-pause" title="Pause Simulation">
+            <span>⏸</span> Pause
+          </button>
+          <button id="btn-sim-reset" class="playback-btn btn-reset" title="Reset Simulation">
+            <span>↺</span> Reset
+          </button>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- 4. Compact Dataset Preview Section -->
+    <div class="dataset-preview-card">
+      <div class="preview-header-bar">
+        <div class="preview-title-group">
+          <h3 class="preview-title">Dataset Preview</h3>
+          <span class="badge badge-cyan">Active Configuration</span>
+        </div>
+        <div class="dataset-stats-strip" id="dataset-stats-container">
+          <!-- Dynamically populated stats -->
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>Arrival Time (ms)</th>
+              <th>Burst Time (ms)</th>
+              <th>Priority</th>
+              <th>State</th>
+            </tr>
+          </thead>
+          <tbody id="preview-table-body">
+            <!-- Dynamically populated process rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../js/workload-data.js"></script>
+  <script src="../js/workloads.js"></script>
+  <script src="../js/simulation.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.SimulationController) window.SimulationController.mount();
+    });
+  </script>
+</body>
+</html>

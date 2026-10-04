@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Process Analysis | CPU Scheduling Analyzer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/charts.css">
+  <link rel="stylesheet" href="../css/analysis.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="padding: 24px; background-color: var(--bg-app);">
+  <div class="dashboard-container">
+    <div class="view-header">
+      <h1 class="view-title">Process-Level Analysis & Deep Dive</h1>
+      <p class="view-subtitle">Granular lifecycle metrics, starvation detection, execution interval traces, and CSV export</p>
+    </div>
+
+    <!-- Summary KPI Cards -->
+    <div class="analysis-kpi-grid">
+      <div class="analysis-kpi-card accent-cyan">
+        <div class="analysis-kpi-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Total Processes
+        </div>
+        <div class="analysis-kpi-value" id="analysis-kpi-total-procs">25</div>
+        <div class="analysis-kpi-sub">Workload queue batch size</div>
+      </div>
+
+      <div class="analysis-kpi-card accent-blue">
+        <div class="analysis-kpi-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Avg Waiting Time
+        </div>
+        <div class="analysis-kpi-value" id="analysis-kpi-avg-wait">--<span class="analysis-kpi-unit">ms</span></div>
+        <div class="analysis-kpi-sub">Mean queue residency latency</div>
+      </div>
+
+      <div class="analysis-kpi-card accent-purple">
+        <div class="analysis-kpi-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Avg Turnaround Time
+        </div>
+        <div class="analysis-kpi-value" id="analysis-kpi-avg-turnaround">--<span class="analysis-kpi-unit">ms</span></div>
+        <div class="analysis-kpi-sub">Total lifespan (Arrival to End)</div>
+      </div>
+
+      <div class="analysis-kpi-card accent-green">
+        <div class="analysis-kpi-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Avg Response Time
+        </div>
+        <div class="analysis-kpi-value" id="analysis-kpi-avg-response">--<span class="analysis-kpi-unit">ms</span></div>
+        <div class="analysis-kpi-sub">First dispatch delay</div>
+      </div>
+
+      <div class="analysis-kpi-card accent-rose">
+        <div class="analysis-kpi-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Starved Processes
+        </div>
+        <div class="analysis-kpi-value" id="analysis-kpi-starved-count">--</div>
+        <div class="analysis-kpi-sub" id="analysis-kpi-starved-sub">Threshold: >2 × W_avg</div>
+      </div>
+    </div>
+
+    <!-- Controls & Filter Toolbar -->
+    <div class="analysis-toolbar-card">
+      <div class="analysis-controls-group">
+        <span class="analysis-group-label">Algorithm:</span>
+        <div class="analysis-algo-pills">
+          <button class="analysis-algo-btn" data-algo="FCFS">FCFS</button>
+          <button class="analysis-algo-btn" data-algo="SJF">SJF</button>
+          <button class="analysis-algo-btn" data-algo="SRTF">SRTF</button>
+          <button class="analysis-algo-btn active" data-algo="RR">Round Robin</button>
+          <button class="analysis-algo-btn" data-algo="Priority">Priority</button>
+        </div>
+
+        <div class="analysis-filter-select-wrapper">
+          <span class="analysis-group-label">Workload:</span>
+          <select id="select-analysis-workload" class="analysis-select">
+            <option value="normal">Normal</option>
+            <option value="skewed">Skewed</option>
+            <option value="bursty">Bursty</option>
+          </select>
+        </div>
+
+        <div class="analysis-filter-select-wrapper">
+          <span class="analysis-group-label">Seed:</span>
+          <select id="select-analysis-seed" class="analysis-select">
+            <option value="0">Seed 0</option>
+            <option value="1">Seed 1</option>
+            <option value="2">Seed 2</option>
+            <option value="3">Seed 3</option>
+            <option value="4">Seed 4</option>
+            <option value="5">Seed 5</option>
+            <option value="6">Seed 6</option>
+            <option value="7">Seed 7</option>
+            <option value="8">Seed 8</option>
+            <option value="9">Seed 9</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button id="btn-export-analysis-csv" class="btn-export-csv" title="Export currently filtered table as CSV">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          EXPORT CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Split Layout: Table on Left, Detail Card on Right -->
+    <div class="analysis-layout">
+      <!-- Process Table Column -->
+      <div class="analysis-table-card">
+        <div class="analysis-table-header-bar">
+          <div class="analysis-table-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Process Lifecycle & Latency Table
+          </div>
+          <div class="analysis-table-hint">
+            Click any row to inspect execution intervals
+          </div>
+        </div>
+
+        <div class="analysis-table-scroll">
+          <table class="process-table">
+            <thead>
+              <tr>
+                <th class="sortable active-sort" data-col="pid">PID <span class="sort-indicator">▲</span></th>
+                <th class="sortable numeric" data-col="arrival">Arrival Time <span class="sort-indicator">↕</span></th>
+                <th class="sortable numeric" data-col="burst">Burst Time <span class="sort-indicator">↕</span></th>
+                <th class="sortable numeric" data-col="priority">Priority <span class="sort-indicator">↕</span></th>
+                <th class="sortable numeric" data-col="start">Start Time <span class="sort-indicator">↕</span></th>
+                <th class="sortable numeric" data-col="completion">Completion Time <span class="sort-indicator">↕</span></th>
+                <th class="sortable numeric" data-col="waiting">Waiting Time <span class="sort-indicator">↕</span></th>
+                <th class="sortable numeric" data-col="turnaround">Turnaround Time <span class="sort-indicator">↕</span></th>
+                <th class="sortable numeric" data-col="response">Response Time <span class="sort-indicator">↕</span></th>
+                <th class="sortable" data-col="starved">Starved <span class="sort-indicator">↕</span></th>
+              </tr>
+            </thead>
+            <tbody id="analysis-table-body">
+              <!-- Injected dynamically by AnalysisController -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Process Detail & Execution Slices Column -->
+      <div id="analysis-process-detail-card" class="analysis-detail-card">
+        <!-- Injected dynamically by AnalysisController -->
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/benchmark-data.js"></script>
+  <script src="../js/process-data.js"></script>
+  <script src="../js/analysis.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.AnalysisController) {
+        window.AnalysisController.mount();
+      }
+    });
+  </script>
+</body>
+</html>

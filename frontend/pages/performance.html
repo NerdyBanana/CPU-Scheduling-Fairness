@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance Benchmarks | CPU Scheduling Analyzer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/charts.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="padding: 24px; background-color: var(--bg-app);">
+  <div class="dashboard-container">
+    <div class="view-header">
+      <h1 class="view-title">Performance Benchmark Analysis</h1>
+      <p class="view-subtitle">Interactive comparison of latency, turnaround, throughput, and CPU utilization across 150 benchmark scenarios</p>
+    </div>
+
+    <!-- Filter Toolbar -->
+    <div class="chart-filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">Workload:</span>
+        <select class="compact-select select-chart-workload">
+          <option value="normal" selected>Normal (Gaussian)</option>
+          <option value="skewed">Skewed (Short & Long)</option>
+          <option value="bursty">Bursty (Clustered)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Benchmark Run:</span>
+        <select class="compact-select select-chart-seed">
+          <option value="mean" selected>Aggregate Summary (Mean across 10 seeds)</option>
+          <option value="0">Seed 0</option>
+          <option value="1">Seed 1</option>
+          <option value="2">Seed 2</option>
+          <option value="3">Seed 3</option>
+          <option value="4">Seed 4</option>
+          <option value="5">Seed 5</option>
+          <option value="6">Seed 6</option>
+          <option value="7">Seed 7</option>
+          <option value="8">Seed 8</option>
+          <option value="9">Seed 9</option>
+        </select>
+      </div>
+
+      <span class="badge badge-cyan">Plotly.js Interactive Graphics</span>
+    </div>
+
+    <!-- 2-Column Grid: Waiting/Turnaround & Response -->
+    <div class="charts-grid-two-col">
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">Average Waiting & Turnaround Times (ms)</h3>
+          <span class="badge badge-primary">Grouped Comparison</span>
+        </div>
+        <div id="chart-waiting-turnaround" class="plotly-chart-container"></div>
+      </div>
+
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">Average Response Time (ms)</h3>
+          <span class="badge badge-success">Lower is Better</span>
+        </div>
+        <div id="chart-response-time" class="plotly-chart-container"></div>
+      </div>
+    </div>
+
+    <!-- 2-Column Grid: Throughput & CPU Utilization -->
+    <div class="charts-grid-two-col">
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">System Throughput (Processes / ms)</h3>
+          <span class="badge badge-green">Higher is Better</span>
+        </div>
+        <div id="chart-throughput" class="plotly-chart-container"></div>
+      </div>
+
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">CPU Utilization (%)</h3>
+          <span class="badge badge-purple">Hardware Efficiency</span>
+        </div>
+        <div id="chart-cpu-utilization" class="plotly-chart-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/plotly.min.js"></script>
+  <script src="../js/benchmark-data.js"></script>
+  <script src="../js/workload-data.js"></script>
+  <script src="../js/workloads.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.ChartsController) window.ChartsController.mount();
+    });
+  </script>
+</body>
+</html>

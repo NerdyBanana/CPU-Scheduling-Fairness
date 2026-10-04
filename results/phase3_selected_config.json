@@ -1,0 +1,72 @@
+{
+  "gmax": 32,
+  "protected_quantum": 1,
+  "boost_interval": 8,
+  "max_boost": 4,
+  "debt_epsilon": 0.25,
+  "context_switch_cost": 0,
+  "policy": "HNWF",
+  "policy_version": "1.0.0",
+  "nice_mapping": "priority_minus_5",
+  "nice_weights": {
+    "-4": 2501,
+    "-3": 1991,
+    "-2": 1586,
+    "-1": 1277,
+    "0": 1024,
+    "1": 820,
+    "2": 655,
+    "3": 526,
+    "4": 423
+  },
+  "selection_protocol": {
+    "tuning_workloads": [
+      "normal",
+      "skewed",
+      "bursty"
+    ],
+    "tuning_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "held_out_seeds": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "selection_order": [
+      "guard_bound_violations ascending",
+      "gmax ascending",
+      "worst_service_gap ascending",
+      "mean_p95_service_gap ascending",
+      "mean_weighted_service_fairness descending",
+      "mean_avg_waiting_time ascending",
+      "mean_context_switches ascending"
+    ]
+  },
+  "training_result": {
+    "gmax": 32.0,
+    "protected_quantum": 1.0,
+    "boost_interval": 8.0,
+    "max_boost": 4.0,
+    "debt_epsilon": 0.25,
+    "context_switch_cost": 0.0,
+    "training_runs": 18.0,
+    "training_processes": 450.0,
+    "guard_bound_violations": 0.0,
+    "guard_violation_rate": 0.0,
+    "worst_service_gap": 32.0,
+    "mean_p95_service_gap": 31.977777777777778,
+    "mean_weighted_service_fairness": 0.9792666666666666,
+    "mean_avg_waiting_time": 217.05333333333337,
+    "mean_p95_waiting_time": 394.4444444444445,
+    "mean_context_switches": 446.1111111111111,
+    "mean_guard_activations": 56.27777777777778,
+    "selection_rank": 1.0
+  }
+}

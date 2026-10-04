@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gantt Timeline | CPU Scheduling Analyzer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/simulation.css">
+  <link rel="stylesheet" href="../css/charts.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="padding: 24px; background-color: var(--bg-app);">
+  <div class="dashboard-container">
+    <div class="view-header">
+      <h1 class="view-title">Interactive Gantt Timeline</h1>
+      <p class="view-subtitle">Chronological CPU execution timeline with separate execution slices for preemptive algorithms</p>
+    </div>
+
+    <!-- Gantt Controls Deck -->
+    <div class="gantt-controls-deck">
+      <div class="filter-group">
+        <span class="filter-label">Algorithm:</span>
+        <div class="workload-pills-group">
+          <button class="workload-pill gantt-algo-btn active" data-algo="RR">Round Robin</button>
+          <button class="workload-pill gantt-algo-btn" data-algo="FCFS">FCFS</button>
+          <button class="workload-pill gantt-algo-btn" data-algo="SJF">SJF</button>
+          <button class="workload-pill gantt-algo-btn" data-algo="SRTF">SRTF</button>
+          <button class="workload-pill gantt-algo-btn" data-algo="Priority">Priority</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Workload:</span>
+        <select id="select-gantt-workload" class="compact-select">
+          <option value="normal" selected>Normal</option>
+          <option value="skewed">Skewed</option>
+          <option value="bursty">Bursty</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Seed:</span>
+        <select id="select-gantt-seed" class="compact-select">
+          <option value="0" selected>Seed 0</option>
+          <option value="1">Seed 1</option>
+          <option value="2">Seed 2</option>
+          <option value="3">Seed 3</option>
+          <option value="4">Seed 4</option>
+          <option value="5">Seed 5</option>
+          <option value="6">Seed 6</option>
+          <option value="7">Seed 7</option>
+          <option value="8">Seed 8</option>
+          <option value="9">Seed 9</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <button id="btn-gantt-reset-view" class="btn-action-secondary" title="Reset Zoom / Pan">
+          <span>↺</span> Reset View
+        </button>
+        <span id="gantt-active-meta-badge" class="badge badge-cyan">RR • NORMAL (Seed 0)</span>
+      </div>
+    </div>
+
+    <!-- Single CPU Execution Timeline Chart -->
+    <div class="chart-panel-card">
+      <div class="chart-panel-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <h3 class="chart-panel-title">CPU 1 Execution Timeline</h3>
+          <span class="gantt-hint-badge">🔍 Zoom &amp; Pan enabled • Hover for slice details</span>
+        </div>
+        <span class="badge badge-success">Single CPU Architecture</span>
+      </div>
+      <div id="gantt-chart-display" class="plotly-chart-container tall-height"></div>
+    </div>
+
+    <!-- Slices Breakdown Table Card -->
+    <div class="gantt-slices-card">
+      <div class="chart-panel-header">
+        <h3 class="chart-panel-title">Chronological Execution Slices (Separate Preemptive Slices)</h3>
+        <span class="badge badge-primary">Granular Traces</span>
+      </div>
+      <div class="table-responsive">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Slice #</th>
+              <th>Process</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Duration</th>
+              <th>Execution Mode</th>
+            </tr>
+          </thead>
+          <tbody id="gantt-slices-table-body">
+            <!-- Slices injected dynamically by gantt.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/plotly.min.js"></script>
+  <script src="../js/benchmark-data.js"></script>
+  <script src="../js/workload-data.js"></script>
+  <script src="../js/workloads.js"></script>
+  <script src="../js/gantt.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.GanttController) window.GanttController.mount();
+    });
+  </script>
+</body>
+</html>

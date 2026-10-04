@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workloads | CPU Scheduling Analyzer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/simulation.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="padding: 24px; background-color: var(--bg-app);">
+  <div class="dashboard-container">
+    <div class="view-header">
+      <h1 class="view-title">Workload Datasets & Configuration</h1>
+      <p class="view-subtitle">Explore arrival distributions, burst durations, and priority classes across 30 generated benchmark files or upload custom CSVs</p>
+    </div>
+
+    <!-- Workload Controls Deck -->
+    <div class="workload-controls-bar">
+      <div class="control-item-wrap">
+        <span class="control-label-text">Distribution:</span>
+        <div class="workload-pills-group">
+          <button class="workload-pill active" data-workload="normal">Normal</button>
+          <button class="workload-pill" data-workload="skewed">Skewed</button>
+          <button class="workload-pill" data-workload="bursty">Bursty</button>
+        </div>
+      </div>
+
+      <div class="control-item-wrap">
+        <span class="control-label-text">Process Count:</span>
+        <input type="number" class="compact-input input-proc-count" min="1" max="25" value="6">
+      </div>
+
+      <div class="control-item-wrap">
+        <span class="control-label-text">Random Seed:</span>
+        <select class="compact-select select-workload-seed">
+          <option value="0" selected>Seed 0</option>
+          <option value="1">Seed 1</option>
+          <option value="2">Seed 2</option>
+          <option value="3">Seed 3</option>
+          <option value="4">Seed 4</option>
+          <option value="5">Seed 5</option>
+          <option value="6">Seed 6</option>
+          <option value="7">Seed 7</option>
+          <option value="8">Seed 8</option>
+          <option value="9">Seed 9</option>
+        </select>
+      </div>
+
+      <div class="control-item-wrap">
+        <button type="button" class="btn-upload-csv btn-upload-csv-trigger" title="Upload custom CSV workload">
+          <span>📁</span> Upload CSV
+        </button>
+        <input type="file" id="input-custom-csv-file" accept=".csv" style="display:none;">
+        <span id="custom-csv-status-badge" style="display:none;"></span>
+      </div>
+    </div>
+
+    <!-- Dataset Preview Card on Workloads View -->
+    <div class="dataset-preview-card">
+      <div class="preview-header-bar">
+        <div class="preview-title-group">
+          <h3 class="preview-title">Dataset Structure & Metrics</h3>
+          <span class="badge badge-primary">30 Pre-Generated CSVs Available</span>
+        </div>
+        <div class="dataset-stats-strip" id="workloads-page-stats-container">
+          <!-- Dynamically populated stats -->
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>PID</th>
+              <th>Arrival Time (ms)</th>
+              <th>Burst Time (ms)</th>
+              <th>Priority</th>
+              <th>State</th>
+            </tr>
+          </thead>
+          <tbody id="workloads-page-table-body">
+            <!-- Dynamically populated process rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/workload-data.js"></script>
+  <script src="../js/workloads.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.WorkloadsController) window.WorkloadsController.mount();
+    });
+  </script>
+</body>
+</html>

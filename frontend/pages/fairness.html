@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fairness & Starvation | CPU Scheduling Analyzer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/charts.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="padding: 24px; background-color: var(--bg-app);">
+  <div class="dashboard-container">
+    <div class="view-header">
+      <h1 class="view-title">Fairness & Starvation Analysis</h1>
+      <p class="view-subtitle">Jain's Fairness Index evaluation, starvation counts, and waiting time variance</p>
+    </div>
+
+    <!-- Educational Callout Banner -->
+    <div class="educational-banner">
+      <div class="educational-icon">⚖️</div>
+      <div class="educational-content">
+        <span class="educational-title">Evaluation Metric: Jain's Fairness Index</span>
+        <p class="educational-text">
+          Jain's Fairness Index measures how evenly CPU allocation is distributed. Higher values indicate more even allocation.
+          Processes with waiting times exceeding the starvation threshold (\(2 \times \text{Mean Waiting Time}\)) are flagged as starved.
+        </p>
+      </div>
+    </div>
+
+    <!-- Filter Toolbar -->
+    <div class="chart-filter-bar">
+      <div class="filter-group">
+        <span class="filter-label">Workload:</span>
+        <select class="compact-select select-chart-workload">
+          <option value="normal" selected>Normal (Gaussian)</option>
+          <option value="skewed">Skewed (Short & Long)</option>
+          <option value="bursty">Bursty (Clustered)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-label">Benchmark Run:</span>
+        <select class="compact-select select-chart-seed">
+          <option value="mean" selected>Aggregate Summary (Mean across 10 seeds)</option>
+          <option value="0">Seed 0</option>
+          <option value="1">Seed 1</option>
+          <option value="2">Seed 2</option>
+          <option value="3">Seed 3</option>
+          <option value="4">Seed 4</option>
+          <option value="5">Seed 5</option>
+          <option value="6">Seed 6</option>
+          <option value="7">Seed 7</option>
+          <option value="8">Seed 8</option>
+          <option value="9">Seed 9</option>
+        </select>
+      </div>
+
+      <span class="badge badge-primary">Fairness Evaluated</span>
+    </div>
+
+    <!-- 2-Column Grid: Jain's Index & Starvation Count -->
+    <div class="charts-grid-two-col">
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">Jain's Fairness Index (0.0 to 1.0)</h3>
+          <span class="badge badge-cyan">Max 1.0 = Perfect Equity</span>
+        </div>
+        <div id="chart-jains-fairness" class="plotly-chart-container"></div>
+      </div>
+
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">Starvation Count (Waiting &gt; 2 &times; Mean)</h3>
+          <span class="badge badge-warning">Starvation Detection</span>
+        </div>
+        <div id="chart-starvation-count" class="plotly-chart-container"></div>
+      </div>
+    </div>
+
+    <!-- 2-Column Grid: Max Waiting & Waiting StdDev -->
+    <div class="charts-grid-two-col">
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">Maximum Waiting Time (ms)</h3>
+          <span class="badge badge-amber">Worst-Case Latency</span>
+        </div>
+        <div id="chart-max-waiting" class="plotly-chart-container"></div>
+      </div>
+
+      <div class="chart-panel-card">
+        <div class="chart-panel-header">
+          <h3 class="chart-panel-title">Waiting Time Standard Deviation (ms)</h3>
+          <span class="badge badge-purple">Variance & Jitter</span>
+        </div>
+        <div id="chart-wait-stddev" class="plotly-chart-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/plotly.min.js"></script>
+  <script src="../js/benchmark-data.js"></script>
+  <script src="../js/workload-data.js"></script>
+  <script src="../js/workloads.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.ChartsController) window.ChartsController.mount();
+    });
+  </script>
+</body>
+</html>

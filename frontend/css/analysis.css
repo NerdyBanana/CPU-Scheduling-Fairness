@@ -1,0 +1,759 @@
+/* ==========================================================================
+   analysis.css — Process-Level Analysis & Deep Dive Styling
+   CPU Scheduling Analyzer (Phase 1 Baseline)
+   ========================================================================== */
+
+/* 1. Summary KPI Cards Grid */
+.analysis-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.analysis-kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.analysis-kpi-card:hover {
+  border-color: var(--border-medium);
+  transform: translateY(-2px);
+}
+
+.analysis-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent-blue);
+  opacity: 0.8;
+}
+
+.analysis-kpi-card.accent-cyan::before { background: var(--accent-cyan); }
+.analysis-kpi-card.accent-purple::before { background: var(--accent-purple); }
+.analysis-kpi-card.accent-amber::before { background: var(--accent-amber); }
+.analysis-kpi-card.accent-green::before { background: var(--accent-green); }
+.analysis-kpi-card.accent-rose::before { background: var(--accent-rose); }
+
+.analysis-kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.analysis-kpi-value {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.analysis-kpi-unit {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.analysis-kpi-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* 2. Controls Toolbar & Filter Deck */
+.analysis-toolbar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.analysis-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.analysis-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.analysis-algo-pills {
+  display: flex;
+  background: rgba(10, 17, 34, 0.7);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  gap: 2px;
+}
+
+.analysis-algo-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.analysis-algo-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.analysis-algo-btn.active {
+  background: var(--accent-cyan);
+  color: #050a14;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.analysis-filter-select-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analysis-select {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.analysis-select:hover, .analysis-select:focus {
+  border-color: var(--accent-cyan);
+}
+
+/* 3. Export CSV Button */
+.btn-export-csv {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(56, 189, 248, 0.25));
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+}
+
+.btn-export-csv:hover {
+  background: var(--accent-cyan);
+  color: #050a14;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+/* 4. Split Layout (Table on Left, Detail Panel on Right) */
+.analysis-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(360px, 1.1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+/* 5. Process Table Card */
+.analysis-table-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.analysis-table-header-bar {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(10, 17, 34, 0.5);
+}
+
+.analysis-table-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.analysis-table-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.analysis-table-scroll {
+  max-height: 580px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.process-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+}
+
+.process-table th {
+  background: #091124;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 14px;
+  border-bottom: 2px solid rgba(56, 189, 248, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.process-table th.sortable {
+  cursor: pointer;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.process-table th.sortable:hover {
+  color: var(--accent-cyan);
+  background: #0d1730;
+}
+
+.process-table th .sort-indicator {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 10px;
+  opacity: 0.35;
+  transition: opacity var(--transition-fast);
+}
+
+.process-table th.active-sort {
+  color: var(--accent-cyan);
+}
+
+.process-table th.active-sort .sort-indicator {
+  opacity: 1;
+  color: var(--accent-cyan);
+}
+
+.process-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  white-space: nowrap;
+  transition: background var(--transition-fast);
+}
+
+.process-table td.numeric {
+  font-family: var(--font-mono);
+  text-align: right;
+  font-size: 12px;
+}
+
+.process-table th.numeric {
+  text-align: right;
+}
+
+.process-table tbody tr {
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.process-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.06);
+}
+
+.process-table tbody tr.is-selected {
+  background: rgba(0, 240, 255, 0.12) !important;
+  box-shadow: inset 3px 0 0 var(--accent-cyan);
+}
+
+.process-table tbody tr.is-selected td {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Process PID badge in table */
+.proc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.proc-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+}
+
+/* Starvation Badges */
+.badge-starved {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.2);
+}
+
+.badge-not-starved {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+/* 6. Process Detail Panel */
+.analysis-detail-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  position: sticky;
+  top: 24px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.detail-proc-id-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-proc-badge {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 240, 255, 0.15);
+  color: var(--accent-cyan);
+  border: 1px solid var(--accent-cyan);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+}
+
+.detail-proc-meta-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.detail-proc-meta-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Detail Metrics Mini Grid */
+.detail-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.detail-metric-box {
+  background: rgba(10, 17, 34, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.detail-metric-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.detail-metric-value {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.detail-metric-unit {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: normal;
+}
+
+/* Starvation Formula Banner */
+.detail-starve-banner {
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(15, 24, 44, 0.7);
+  border-left: 3px solid var(--accent-green);
+}
+
+.detail-starve-banner.is-starved {
+  border-left-color: var(--accent-rose);
+  background: rgba(244, 63, 94, 0.08);
+}
+
+.detail-starve-title {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.detail-starve-formula {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* 7. Execution Intervals / Slices Ladder */
+.slices-tree-container {
+  background: rgba(7, 12, 24, 0.8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.slices-tree-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.slice-tree-list {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.slice-tree-node {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.slice-tree-branch {
+  color: var(--accent-cyan);
+  user-select: none;
+  font-size: 13px;
+}
+
+.slice-tree-range {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.slice-tree-dur {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Empty detail state */
+.detail-empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+}
+
+.detail-empty-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.detail-empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.detail-empty-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* 8. Responsive Adjustments */
+@media (max-width: 1200px) {
+  .analysis-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .analysis-layout {
+    grid-template-columns: 1fr;
+  }
+  .analysis-detail-card {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .analysis-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .analysis-toolbar-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .analysis-controls-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .analysis-algo-pills {
+    overflow-x: auto;
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Execution Analysis (Combined Timeline & Process Explanation) Styles
+   ========================================================================== */
+.exec-explanation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 24px;
+}
+
+.process-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.process-pid-badge {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.process-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  background: rgba(10, 17, 34, 0.65);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.proc-metric-cell {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.proc-metric-cell .lbl {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.explanation-text-block {
+  background: rgba(15, 23, 42, 0.7);
+  border-left: 3px solid var(--accent-cyan);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+
+.explanation-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  margin-bottom: 8px;
+}
+
+.explanation-paragraph {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.starvation-notice-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  border-radius: var(--radius-sm);
+  color: #fda4af;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.execution-slices-block {
+  background: rgba(10, 17, 34, 0.65);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+
+.slices-block-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.slices-count-pill {
+  font-size: 11px;
+  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.slices-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.exec-slice-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.exec-slice-chip .slice-index {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+.exec-slice-chip .slice-times {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.exec-slice-chip .slice-dur {
+  color: var(--text-muted);
+}
+
+.selected-row {
+  background: rgba(0, 240, 255, 0.12) !important;
+  box-shadow: inset 3px 0 0 var(--accent-cyan);
+}
+.selected-row td {
+  font-weight: 600;
+  color: #ffffff;
+}
+

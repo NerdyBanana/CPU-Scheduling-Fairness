@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Dashboard | CPU Scheduling Analyzer</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="padding: 24px; background-color: var(--bg-app);">
+  <div class="dashboard-container">
+    <div class="view-header">
+      <h1 class="view-title">Executive Dashboard</h1>
+      <p class="view-subtitle">Phase 1 Baseline Performance & Fairness Metrics across 150 Benchmark Scenarios</p>
+    </div>
+
+    <!-- KPI Cards Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-waiting">
+        <div class="kpi-top">
+          <span class="kpi-label">Best Avg Waiting Time</span>
+          <div class="kpi-icon">⚡</div>
+        </div>
+        <div id="kpi-best-wait-val" class="kpi-main-val">100.1 <span style="font-size:15px; color:var(--text-secondary)">ms</span></div>
+        <div id="kpi-best-wait-sub" class="kpi-sub"><span class="kpi-highlight">SRTF</span> achieves lowest overall latency</div>
+      </div>
+
+      <div class="kpi-card kpi-fairness">
+        <div class="kpi-top">
+          <span class="kpi-label">Highest Fairness Index</span>
+          <div class="kpi-icon">⚖️</div>
+        </div>
+        <div id="kpi-highest-fair-val" class="kpi-main-val">0.910</div>
+        <div id="kpi-highest-fair-sub" class="kpi-sub"><span class="kpi-highlight">Round Robin (q=2)</span> Jain's Index</div>
+      </div>
+
+      <div class="kpi-card kpi-starvation">
+        <div class="kpi-top">
+          <span class="kpi-label">Lowest Starvation Count</span>
+          <div class="kpi-icon">🛡️</div>
+        </div>
+        <div id="kpi-lowest-starve-val" class="kpi-main-val">0 <span style="font-size:15px; color:var(--text-secondary)">processes</span></div>
+        <div id="kpi-lowest-starve-sub" class="kpi-sub">Threshold: 2 × Mean Waiting Time</div>
+      </div>
+
+      <div class="kpi-card kpi-workload">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Processes</span>
+          <div class="kpi-icon">📦</div>
+        </div>
+        <div id="kpi-total-procs-val" class="kpi-main-val">6 <span style="font-size:15px; color:var(--text-secondary)">tasks</span></div>
+        <div id="kpi-total-procs-sub" class="kpi-sub">Active Workload: NORMAL</div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-main-grid">
+      <div class="comparison-card">
+        <div class="card-heading-bar">
+          <h3 class="card-title">Algorithm Comparison Matrix</h3>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <select id="select-dashboard-workload" class="compact-select">
+              <option value="normal" selected>Normal Workload</option>
+              <option value="skewed">Skewed Workload</option>
+              <option value="bursty">Bursty Workload</option>
+            </select>
+            <span class="badge badge-success">Benchmark Validated</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Algorithm</th>
+                <th>Avg Waiting (ms)</th>
+                <th>Avg Turnaround (ms)</th>
+                <th>Avg Response (ms)</th>
+                <th>Jain's Fairness</th>
+                <th>Starved Count</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dashboard-comparison-table-body">
+              <tr>
+                <td><strong>FCFS</strong></td>
+                <td>131.5</td>
+                <td>143.8</td>
+                <td>131.5</td>
+                <td>0.736</td>
+                <td>0</td>
+                <td><span class="badge badge-neutral">Baseline</span></td>
+              </tr>
+              <tr>
+                <td><strong>SJF (Non-preemptive)</strong></td>
+                <td>100.3</td>
+                <td>112.7</td>
+                <td>100.3</td>
+                <td>0.573</td>
+                <td>4</td>
+                <td><span class="badge badge-cyan">Shortest Job</span></td>
+              </tr>
+              <tr style="background: rgba(0, 240, 255, 0.04);">
+                <td><strong>SRTF (Preemptive)</strong></td>
+                <td><span style="color:var(--accent-cyan); font-weight:700;">100.1</span></td>
+                <td>112.5</td>
+                <td>99.8</td>
+                <td>0.571</td>
+                <td>4</td>
+                <td><span class="badge badge-success">Optimal Waiting</span></td>
+              </tr>
+              <tr style="background: rgba(56, 189, 248, 0.04);">
+                <td><strong>Round Robin (q=2)</strong></td>
+                <td>201.7</td>
+                <td>214.0</td>
+                <td><span style="color:var(--accent-blue); font-weight:700;">43.1</span></td>
+                <td><span style="color:var(--accent-blue); font-weight:700;">0.910</span></td>
+                <td>0</td>
+                <td><span class="badge badge-primary">Most Fair</span></td>
+              </tr>
+              <tr>
+                <td><strong>Priority (Non-preemptive)</strong></td>
+                <td>130.7</td>
+                <td>143.1</td>
+                <td>130.7</td>
+                <td>0.686</td>
+                <td>2</td>
+                <td><span class="badge badge-warning">Priority-Bound</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="active-context-card">
+        <div class="context-header">
+          <h3 class="card-title">Active Environment</h3>
+          <span class="badge badge-primary">Normal Workload</span>
+        </div>
+        <div class="context-details-list">
+          <div class="context-item">
+            <span class="context-key">Workload Distribution</span>
+            <span class="context-val">Gaussian (Normal)</span>
+          </div>
+          <div class="context-item">
+            <span class="context-key">Random Seed</span>
+            <span class="context-val">Seed 0</span>
+          </div>
+          <div class="context-item">
+            <span class="context-key">Hardware Cores</span>
+            <span class="context-val">4 Cores Active</span>
+          </div>
+          <div class="context-item">
+            <span class="context-key">Default Quantum</span>
+            <span class="context-val">2 ms</span>
+          </div>
+          <div class="context-item">
+            <span class="context-key">Preemption Engine</span>
+            <span class="context-val" style="color:var(--accent-green)">Enabled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/benchmark-data.js"></script>
+  <script src="../js/workload-data.js"></script>
+  <script src="../js/workloads.js"></script>
+  <script src="../js/dashboard.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.DashboardController) window.DashboardController.mount();
+    });
+  </script>
+</body>
+</html>

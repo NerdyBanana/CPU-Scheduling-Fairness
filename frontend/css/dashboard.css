@@ -1,0 +1,250 @@
+/* ==========================================================================
+   dashboard.css — Executive Overview & KPI Styling
+   ========================================================================== */
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* KPI Summary Cards Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background var(--transition-fast);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-medium);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+}
+
+.kpi-card.kpi-waiting::before { background: var(--accent-cyan); }
+.kpi-card.kpi-fairness::before { background: var(--accent-blue); }
+.kpi-card.kpi-starvation::before { background: var(--accent-amber); }
+.kpi-card.kpi-workload::before { background: var(--accent-purple); }
+
+.kpi-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.kpi-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.kpi-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.kpi-main-val {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+
+.kpi-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.kpi-sub span.kpi-highlight {
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+/* Secondary Dashboard Grid Layout */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+/* Algorithm Comparison Card */
+.comparison-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  backdrop-filter: blur(12px);
+}
+
+.card-heading-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.comparison-table th {
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.comparison-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.comparison-table tr:hover td {
+  background: rgba(56, 189, 248, 0.04);
+}
+
+.algo-name-cell {
+  font-weight: 600;
+  font-family: var(--font-sans) !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Active Context Card */
+.active-context-card,
+.context-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  backdrop-filter: blur(12px);
+}
+
+.context-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.context-details-list,
+.context-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.context-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+}
+
+.context-key,
+.context-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.context-val {
+  font-size: 13px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btn-full-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--accent-primary);
+  border: 1px solid var(--accent-blue);
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all var(--transition-fast);
+}
+
+.btn-full-action:hover {
+  background: #0369a1;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.quick-action-strip {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+

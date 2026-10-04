@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070918">
+  <title>Fair / OS — CPU Scheduling Fairness Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oxanium:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/phase2-ui.css?v=17">
+</head>
+<body>
+  <div class="ambient ambient-top"></div>
+  <div class="ambient ambient-bottom"></div>
+  <div class="perspective-grid" aria-hidden="true"></div>
+
+  <div class="app-frame">
+    <header class="top-nav glass-panel">
+      <a class="brand" href="#overview" aria-label="Fair OS overview">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 18c3.2 0 3-8 6.1-8 3.2 0 2.8 12 6.2 12 2.7 0 2.8-7 5.7-7"/></svg></span>
+        <span><strong>FAIR / OS</strong><small>PHASE 2</small></span>
+      </a>
+      <nav class="view-nav" aria-label="Primary navigation">
+        <button class="nav-pill active" data-view="overview">Overview</button>
+        <button class="nav-pill" data-view="simulation">Simulation</button>
+        <button class="nav-pill" data-view="fairness">Fairness</button>
+        <button class="nav-pill" data-view="process">Process</button>
+      </nav>
+      <div class="live-pill" id="live-pill"><span></span><b>LIVE</b></div>
+    </header>
+
+    <main>
+      <section class="view active" id="view-overview" data-view-panel="overview">
+        <div class="hero-row">
+          <div>
+            <h1>Fairness, without the noise.</h1>
+            <p>One clear view of latency, fairness and starvation protection across every scheduling policy.</p>
+          </div>
+          <span class="surface-chip">◆ Interactive data surface</span>
+        </div>
+
+        <div class="overview-kpis metric-strip three" id="overview-kpis"></div>
+
+        <div class="overview-layout">
+          <article class="card metric-explorer">
+            <div class="card-head">
+              <div><h2>Metric explorer</h2><p>Switch metric without leaving the overview.</p></div>
+              <span class="interaction-hint">◇ Hover · click · linked</span>
+            </div>
+            <div class="segmented" id="metric-tabs">
+              <button data-metric="avg_waiting_time">Waiting</button>
+              <button data-metric="avg_turnaround_time">Turnaround</button>
+              <button data-metric="avg_response_time">Response</button>
+              <button class="active" data-metric="legacy_jains_waiting_index">Fairness</button>
+              <button data-metric="legacy_starvation_count">Starvation</button>
+            </div>
+            <div class="metric-algorithms" id="metric-algorithms" aria-label="Algorithms included in metric comparison"></div>
+            <div class="chart-stage" id="overview-chart"></div>
+          </article>
+
+          <aside class="overview-side">
+            <div class="cpu-cube-wrap compact">
+              <div class="cpu-cube" aria-label="CPU fairness engine visualization">
+                <div class="cube-top"><span></span></div><div class="cube-left"></div><div class="cube-right"></div>
+              </div>
+            </div>
+            <article class="card balance-card" id="balance-card"></article>
+            <article class="card event-card">
+              <div class="card-head"><div><h2>Linked event stream</h2><p>Chart hover highlights related events.</p></div></div>
+              <div id="event-stream" class="event-stream"></div>
+            </article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="view-simulation" data-view-panel="simulation">
+        <div class="hero-row"><div><h1>Follow one process around the CPU cycle.</h1><p>The star follows the active process through ready, scheduling, running and requeue or completion.</p></div><span class="surface-chip">◆ Live process lifecycle</span></div>
+        <form class="control-bar glass-panel" id="simulation-form">
+          <div class="algorithm-picker" role="group" aria-labelledby="algorithm-picker-title">
+            <div class="algorithm-picker-title" id="algorithm-picker-title"><strong>Select base schedulers</strong><span>Every selected policy can be compared with the same HNWF supervisor.</span></div>
+            <label><input type="checkbox" name="base-algorithm" value="FCFS" checked> FCFS</label>
+            <label><input type="checkbox" name="base-algorithm" value="SJF" checked> SJF</label>
+            <label><input type="checkbox" name="base-algorithm" value="SRTF" checked> SRTF</label>
+            <label><input type="checkbox" name="base-algorithm" value="RR" checked> Round Robin</label>
+            <label><input type="checkbox" name="base-algorithm" value="Priority" checked> Priority</label>
+          </div>
+          <div class="supervisor-toggle">
+            <label for="control-fairness"><input id="control-fairness" type="checkbox" checked><span aria-hidden="true"></span></label>
+            <div><strong>Compare with HNWF Fairness Supervisor</strong><small>Runs each selected base twice: original and fairness-aware.</small></div>
+          </div>
+          <label>Workload<select id="control-workload"><option value="normal">Normal</option><option value="skewed">Skewed</option><option value="bursty">Bursty</option></select></label>
+          <label>Seed<select id="control-seed"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></label>
+          <label>Processes<output id="control-processes">25</output></label>
+          <label>RR quantum<input id="control-quantum" type="number" value="2" min="1"></label>
+          <label>Gmax<input id="control-gmax" type="number" value="32" min="1"></label>
+          <label>Timeline policy<select id="control-focus-algorithm"></select></label>
+          <button class="run-button" type="submit"><span>▣</span> Run comparison</button>
+        </form>
+
+        <article class="card os-flow-card">
+            <div class="card-head"><div><h2>Process lifecycle · <span id="theater-policy">SRTF</span></h2><p id="os-policy-rule">The operating system applies the selected scheduling rule.</p></div><span class="live-clock" id="live-clock">● 0 ms</span></div>
+            <div class="os-flow-stage" id="os-flow-stage">
+              <div class="cycle-orbit">
+                <div class="cycle-ring" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+                <section class="cycle-node ready" id="os-ready-queue" data-cycle-phase="ready"><span>1</span><strong>Ready</strong><small id="cycle-ready-count">Software queue</small></section>
+                <section class="cycle-node scheduler" data-cycle-phase="scheduler"><span>2</span><strong id="os-scheduler-name">Scheduler</strong><small>OS decision</small></section>
+                <section class="cycle-node cpu" id="hardware-core" data-cycle-phase="running"><span>3</span><strong>Running</strong><small>Core 0 · <b id="core-process">IDLE</b></small><em id="core-progress">0 ms</em></section>
+                <section class="cycle-node return" data-cycle-phase="return"><span>4</span><strong id="cycle-return-title">Requeue</strong><small id="cycle-return-detail">More work remains</small></section>
+                <div class="cycle-decision"><small>OS DECISION</small><span id="os-base-choice">Proposal —</span><strong id="os-final-choice">Dispatch —</strong><em id="os-supervisor-state">Base policy</em></div>
+                <div class="os-process-packet process-star" id="os-process-packet" aria-live="polite" aria-label="CPU idle"><i aria-hidden="true">✦</i></div>
+              </div>
+            </div>
+            <div class="playback-panel">
+              <div class="playback-buttons">
+                <button type="button" id="playback-reset" aria-label="Reset playback">↺</button>
+                <button type="button" id="playback-step" aria-label="Step forward one millisecond">›|</button>
+                <button type="button" class="playback-primary" id="playback-toggle">▶ Play</button>
+              </div>
+              <label class="playback-scrubber"><span>Simulation time</span><input id="playback-range" type="range" min="0" max="1" value="0" step="0.01"></label>
+              <label class="playback-speed">Speed<select id="playback-speed"><option value="0.25">0.25×</option><option value="0.5" selected>0.5×</option><option value="0.75">0.75×</option><option value="1">1×</option><option value="1.5">1.5×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+            </div>
+        </article>
+        <article class="card timeline-card">
+          <div class="card-head"><div><h2>Execution timeline · <span id="timeline-policy">HNWF</span></h2><p>Every block is real CPU service from the selected trace. Click a block to replay that dispatch.</p></div><span class="interaction-hint">◇ Click · replay event</span></div>
+          <div class="timeline" id="execution-timeline"></div>
+          <div class="timeline-axis"><span id="timeline-start">0 ms</span><span id="timeline-end">0 ms</span></div>
+          <div class="timeline-explanation" id="timeline-explanation"><span>0 ms</span><strong>Ready to simulate</strong><p>Press Play or choose a timeline block.</p></div>
+        </article>
+      </section>
+
+      <section class="view" id="view-fairness" data-view-panel="fairness">
+        <div class="hero-row"><div><h1>Fairness &amp; starvation.</h1><p>Compare every Phase 1 scheduler with the same HNWF fairness supervisor on one workload.</p></div><span class="surface-chip">◆ ML comparison view</span></div>
+        <div class="fairness-toolbar glass-panel">
+          <div><label for="fairness-pair-select">Focus algorithm pair</label><select id="fairness-pair-select" aria-label="Focus an algorithm and its HNWF result"></select></div>
+          <div class="comparison-legend" aria-label="Chart legend"><span><i class="base"></i>Base algorithm</span><span><i class="supervised"></i>Algorithm + HNWF</span></div>
+          <p>Click any column group to inspect its exact ML and scheduling result.</p>
+        </div>
+        <div class="metric-strip five" id="fairness-kpis"></div>
+        <div class="fairness-comparison-grid">
+          <article class="card comparison-chart-card"><div class="card-head"><div><h2>Fairness index: base vs HNWF</h2><p>Jain waiting-time fairness. Higher is better; 1.0 is perfectly even.</p></div><span class="interaction-hint">◇ Hover · click</span></div><div class="paired-column-chart" id="fairness-comparison-chart"></div></article>
+          <article class="card comparison-chart-card"><div class="card-head"><div><h2>Starved processes: base vs HNWF</h2><p>Processes above the shared starvation threshold. Lower is better.</p></div><span class="interaction-hint">◇ Hover · click</span></div><div class="paired-column-chart" id="starvation-comparison-chart"></div></article>
+          <article class="card ml-chart-card"><div class="card-head"><div><h2>Why the supervisor intervened</h2><p>Decision counts from the ML risk models and hard starvation guard.</p></div><span class="interaction-hint">◇ Hover · click</span></div><div class="ml-column-chart" id="ml-intervention-chart"></div></article>
+          <article class="card pair-detail-card" id="fairness-pair-detail"></article>
+        </div>
+      </section>
+
+      <section class="view" id="view-process" data-view-panel="process">
+        <div class="hero-row"><div><h1>One process. Every fairness decision.</h1><p>Follow a process through <span id="process-policy-name">SRTF+HNWF</span>: base proposal, predicted risk, adjustment and completion.</p></div><span class="surface-chip">◆ Supervisor process trace</span></div>
+        <div class="process-selector glass-panel">
+          <div class="process-algorithm-group">
+            <label for="process-algorithm-select">Supervised algorithm</label>
+            <select id="process-algorithm-select" aria-label="Select a base algorithm with HNWF"></select>
+          </div>
+          <div class="process-select-group">
+            <label for="process-select">Select any process</label>
+            <select id="process-select" aria-label="Select a process to explain"></select>
+            <span id="process-position" class="process-position"></span>
+          </div>
+          <div class="process-nav-buttons" aria-label="Move between processes">
+            <button type="button" id="process-prev">← Previous</button>
+            <button type="button" id="process-next">Next →</button>
+          </div>
+        </div>
+        <div class="process-grid">
+          <article class="card state-card"><div class="card-head"><div><h2 id="state-title">Process journey in state space</h2><p>Hover or focus a sphere to reveal this process's value.</p></div><span class="interaction-hint">◇ Hover · value</span></div><div class="state-orbit" id="state-orbit"></div></article>
+          <article class="card live-state"><div class="card-head"><div><h2>Live fairness state</h2><p id="state-time">Values at the latest decision.</p></div><span class="running-pill">● COMPLETE</span></div><div class="state-metrics" id="state-metrics"></div></article>
+          <article class="card formula-card"><div class="card-head"><div><h2>Process journey in simple words</h2><p>What happened from arrival to completion, using this process's actual values.</p></div><span class="interaction-hint">Read top → bottom</span></div><div class="formula-steps" id="formula-steps"></div></article>
+          <article class="card why-card" id="why-card"></article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/api.js?v=9"></script>
+  <script src="js/data-adapters.js?v=9"></script>
+  <script src="js/store.js?v=9"></script>
+  <script src="js/phase2-ui.js?v=17"></script>
+</body>
+</html>
